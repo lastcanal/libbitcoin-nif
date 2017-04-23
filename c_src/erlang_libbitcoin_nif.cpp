@@ -56,6 +56,17 @@ erlang_libbitcoin_tx_decode(ErlNifEnv* env, int, const ERL_NIF_TERM argv[])
         return enif_make_badarg(env);
     }
 
+    int p2kh;
+    int p2sh;
+
+    if (!nifpp::get(env, argv[1], p2kh)) {
+        return enif_make_badarg(env);
+    }
+
+    if (!nifpp::get(env, argv[2], p2sh)) {
+        return enif_make_badarg(env);
+    }
+
     uint32_t flags = 0x00;
     chain::transaction tx;
     tx.from_data(make_data_chunk(env, &bin));
@@ -75,7 +86,7 @@ erlang_libbitcoin_tx_decode(ErlNifEnv* env, int, const ERL_NIF_TERM argv[])
         prev_input_map["hash"] = make_binary(env, hash256(input.previous_output().hash()).to_string());
         prev_input_map["index"] = nifpp::make(env, input.previous_output().index());
         input_map["previous_output"] = nifpp::make(env, prev_input_map);
-        const auto script_address = payment_address::extract(input.script(), payment_address::mainnet_p2kh, payment_address::mainnet_p2sh);
+        const auto script_address = payment_address::extract(input.script(), p2kh, p2sh);
         if (script_address)
             input_map["address"] = make_binary(env, script_address.encoded());
         input_map["script_asm"] = make_binary(env, chain::script(input.script()).to_string(flags));
@@ -87,7 +98,7 @@ erlang_libbitcoin_tx_decode(ErlNifEnv* env, int, const ERL_NIF_TERM argv[])
     std::list<nifpp::TERM> outputs;
     for (const auto output: tx.outputs()) {
         std::map<nifpp::str_atom, nifpp::TERM> output_map;
-        const auto script_address = payment_address::extract(output.script(), payment_address::mainnet_p2kh, payment_address::mainnet_p2sh);
+        const auto script_address = payment_address::extract(output.script(), p2kh, p2sh);
         ErlNifUInt64 output_value = output.value();
         ErlNifUInt64 output_serialized_size = output.serialized_size();
         if (script_address)
@@ -432,7 +443,7 @@ erlang_libbitcoin_spend_checksum(ErlNifEnv* env, int, const ERL_NIF_TERM argv[])
 }
 
 static ErlNifFunc nif_funcs[] = {
-    {"tx_decode", 1, erlang_libbitcoin_tx_decode, LIBBITCOIN_NIF_FLAGS},
+    {"tx_decode", 3, erlang_libbitcoin_tx_decode, LIBBITCOIN_NIF_FLAGS},
     {"do_tx_encode", 1, erlang_libbitcoin_tx_encode, LIBBITCOIN_NIF_FLAGS},
     {"header_decode", 1, erlang_libbitcoin_header_decode, LIBBITCOIN_NIF_FLAGS},
     {"script_decode", 1, erlang_script_decode, LIBBITCOIN_NIF_FLAGS},

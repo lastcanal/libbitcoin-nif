@@ -1,5 +1,5 @@
 -module(libbitcoin).
--export([tx_decode/1, tx_encode/1,  header_decode/1,
+-export([tx_decode/1, tx_decode/2, tx_decode/3, tx_encode/1,  header_decode/1,
          script_decode/1, script_encode/1, script_to_address/2,
          input_signature_hash/4, spend_checksum/2]).
 
@@ -16,7 +16,15 @@
     script_version => 5
 }).
 
-tx_decode(_RawTx) ->
+tx_decode(RawTx) ->
+    tx_decode(RawTx, 16#00, 16#05).
+
+tx_decode(RawTx, mainnet) ->
+    tx_decode(RawTx);
+tx_decode(RawTx, testnet) ->
+    tx_decode(RawTx, 16#6F, 16#C4).
+
+tx_decode(_RawTx, _P2KH, _P2SH) ->
     not_loaded(?LINE).
 
 tx_encode(TxMap) when is_map(TxMap) ->
