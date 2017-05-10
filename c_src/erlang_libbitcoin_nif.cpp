@@ -200,48 +200,48 @@ erlang_libbitcoin_tx_encode(ErlNifEnv* env, int, const ERL_NIF_TERM argv[])
         chain::script script;
         script.from_data(decoded, false);
         outputs.push_back({ amount, script });
-      } else {
-        wallet::stealth_address stealth(address_str);
+ //   } else {
+ //     wallet::stealth_address stealth(address_str);
 
-        if (!stealth)
-          return enif_make_badarg(env);
+ //     if (!stealth)
+ //       return enif_make_badarg(env);
 
-        if (stealth.signatures() != 1)
-          return enif_make_badarg(env);
+ //     if (stealth.signatures() != 1)
+ //       return enif_make_badarg(env);
 
-        ErlNifBinary seed_bin;
-        if (!enif_inspect_binary(env, output_map["seed"], &seed_bin))
-            return enif_make_badarg(env);
+ //     ErlNifBinary seed_bin;
+ //     if (!enif_inspect_binary(env, output_map["seed"], &seed_bin))
+ //         return enif_make_badarg(env);
 
-        std::string seed_str = make_string(env, &seed_bin);
-        data_chunk seed;
-        if (!decode_base16(seed, seed_str)) // || seed.size() < 16)
-            return enif_make_badarg(env);
+ //     std::string seed_str = make_string(env, &seed_bin);
+ //     data_chunk seed;
+ //     if (!decode_base16(seed, seed_str)) // || seed.size() < 16)
+ //         return enif_make_badarg(env);
 
-        chain::script null_data_script;
-        ec_secret ephemeral_secret;
-        if (!create_stealth_data(null_data_script, ephemeral_secret, stealth.filter(), seed))
-          return enif_make_badarg(env);
+ //     chain::script null_data_script;
+ //     ec_secret ephemeral_secret;
+ //     if (!create_stealth_data(null_data_script, ephemeral_secret, stealth.filter(), seed))
+ //       return enif_make_badarg(env);
 
-        ec_compressed stealth_key;
-        if (!uncover_stealth(stealth_key, stealth.scan_key(), ephemeral_secret, stealth.spend_keys().front()))
-          return enif_make_badarg(env);
+ //     ec_compressed stealth_key;
+ //     if (!uncover_stealth(stealth_key, stealth.scan_key(), ephemeral_secret, stealth.spend_keys().front()))
+ //       return enif_make_badarg(env);
 
-        static constexpr uint64_t no_amount = 0;
-        outputs.push_back({ no_amount, null_data_script });
+ //     static constexpr uint64_t no_amount = 0;
+ //     outputs.push_back({ no_amount, null_data_script });
 
-        machine::operation::list payment_ops;
-        auto hash = bitcoin_short_hash(stealth_key);
-        auto version = stealth.version();
-        if (version != script_version)
-            payment_ops = chain::script::to_pay_key_hash_pattern(hash);
-        else if (version == script_version)
-            payment_ops = chain::script::to_pay_script_hash_pattern(hash);
-        else
-            return false;
+ //     machine::operation::list payment_ops;
+ //     auto hash = bitcoin_short_hash(stealth_key);
+ //     auto version = stealth.version();
+ //     if (version != script_version)
+ //         payment_ops = chain::script::to_pay_key_hash_pattern(hash);
+ //     else if (version == script_version)
+ //         payment_ops = chain::script::to_pay_script_hash_pattern(hash);
+ //     else
+ //         return false;
 
-        const auto payment_script = chain::script{ payment_ops };
-        outputs.push_back({ amount, payment_script });
+ //     const auto payment_script = chain::script{ payment_ops };
+ //     outputs.push_back({ amount, payment_script });
       }
     }
 
