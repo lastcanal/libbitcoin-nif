@@ -218,4 +218,15 @@ spend_checksum_test() ->
   ok.
 
 
+-define(INPUT_TX_IN, "0100000001b3807042c92f449bbf79b33ca59d7dfec7f4cc71096704a9c526dddf496ee0970100000000ffffffff01905f0100000000001976a91418c0bd8d1818f1bf99cb1df2269c645318ef7b7388ac00000000").
+-define(INPUT_TX_OUT, <<"0100000001b3807042c92f449bbf79b33ca59d7dfec7f4cc71096704a9c526dddf496ee097010000006a473044022039a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c202201035fe810e283bcf394485c6a9dfd117ad9f684cdd83d36453718f5d0491b9dd012103c40cbd64c9c608df2c9730f49b0888c4db1c436e8b2b74aead6c6afbd10428c0ffffffff01905f0100000000001976a91418c0bd8d1818f1bf99cb1df2269c645318ef7b7388ac00000000">>).
+-define(INPUT_SCRIPT, <<"[3044022039a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c202201035fe810e283bcf394485c6a9dfd117ad9f684cdd83d36453718f5d0491b9dd01] [03c40cbd64c9c608df2c9730f49b0888c4db1c436e8b2b74aead6c6afbd10428c0]">>).
+
+input_set_test() ->
+  Script = libbitcoin:script_encode(?INPUT_SCRIPT),
+  NewTX = libbitcoin:input_set(hexstr_to_bin(?INPUT_TX_IN), 0, hexstr_to_bin(binary_to_list(Script))),
+  ?assertEqual(binary_to_list(?INPUT_TX_OUT), binary_to_list(NewTX)),
+  ?assertError(badarg, libbitcoin:input_set(hexstr_to_bin(?INPUT_TX_IN), 1, hexstr_to_bin(binary_to_list(Script)))),
+  ok.
+
 -endif.

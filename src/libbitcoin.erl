@@ -1,7 +1,7 @@
 -module(libbitcoin).
 -export([tx_decode/1, tx_decode/2, tx_decode/3, tx_encode/1,  header_decode/1,
          script_decode/1, script_encode/1, script_to_address/2,
-         input_signature_hash/4, spend_checksum/2]).
+         input_signature_hash/4, spend_checksum/2, input_set/3]).
 
 -on_load(init/0).
 
@@ -49,6 +49,9 @@ script_to_address(_Script, _Version) ->
     not_loaded(?LINE).
 
 spend_checksum(_Hash, _Index) ->
+    not_loaded(?LINE).
+
+input_set(_RawTx, _Index, _ScriptASM) ->
     not_loaded(?LINE).
 
 init() ->
