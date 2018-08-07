@@ -62,9 +62,9 @@ hexstr_to_list([]) ->
 -define(TWOOFTHREE_ADDRESS, <<"3AdQeG1eNTKxT2VKeddnZxdQbU5PeCfuk6">>).
 
 tx_decode_p2sh_out_test() ->
-  #{inputs := Inputs, outputs := Outputs,
+  #{inputs := Inputs, outputs := Outputs ,
     coinbase := Coinbase, hash := Hash,
-    size := Size, value := Value,
+    size := Size, weight := Weight, value := Value,
     version := Version} = libbitcoin:tx_decode(?raw_tx_p2sh_out),
   ?assertEqual(Coinbase, false),
   ?assertEqual(Hash, <<"3c9018e8d5615c306d72397f8f5eef44308c98fb576a88e030c25456b4f3a7ac">>),
@@ -72,15 +72,17 @@ tx_decode_p2sh_out_test() ->
   ?assertEqual(Value, 1000000),
   ?assertEqual(Version, 1),
   ?assertEqual(Coinbase, false),
-  
-  ?assertEqual(Inputs,[#{address => <<"18pV61UrtyK9YW8tDa53UkM8DDbFWKiwvc">>,
+  ?assertEqual(Weight, 888),
+  ?assertEqual(Inputs,[#{address_hash => <<"55c3e0412df763244b0fe23a5129cda6f606be45">>,
+                         addresses => [<<"39WW1YyJSsdXdfqKLfjduNi4Mjsy5vvAoY">>, <<"18pV61UrtyK9YW8tDa53UkM8DDbFWKiwvc">>],
                          previous_output => #{
                            hash => <<"d6f72aab8ff86ff6289842a0424319bf2ddba85dc7c52757912297f948286389">>,
                            index => 0},
                          script => <<"483045022100abbc8a73fe2054480bda3f3281da2d0c51e2841391abd4c09f4f908a2034c18d02205bc9e4d68eafb918f3e9662338647a4419c0de1a650ab8983f1d216e2a31d8e30141046f55d7adeff6011c7eac294fe540c57830be80e9355c83869c9260a4b8bf4767a66bacbd70b804dc63d5beeb14180292ad7f3b083372b1d02d7a37dd97ff5c9e">>,
                          script_asm => <<"[3045022100abbc8a73fe2054480bda3f3281da2d0c51e2841391abd4c09f4f908a2034c18d02205bc9e4d68eafb918f3e9662338647a4419c0de1a650ab8983f1d216e2a31d8e301] [046f55d7adeff6011c7eac294fe540c57830be80e9355c83869c9260a4b8bf4767a66bacbd70b804dc63d5beeb14180292ad7f3b083372b1d02d7a37dd97ff5c9e]">>,
                          sequence => 4294967295}]),
-  ?assertEqual(Outputs, [#{address => <<"3QJmV3qfvL9SuYo34YihAf3sRCW3qSinyC">>,
+  ?assertEqual(Outputs, [#{address_hash => <<"f815b036d9bbbce5e9f2a00abd1bf3dc91e95510">>,
+                           address => <<"3QJmV3qfvL9SuYo34YihAf3sRCW3qSinyC">>,
                            script => <<"a914f815b036d9bbbce5e9f2a00abd1bf3dc91e9551087">>,
                            script_asm => <<"hash160 [f815b036d9bbbce5e9f2a00abd1bf3dc91e95510] equal">>,
                            size => 32,
@@ -97,14 +99,17 @@ tx_decode_p2sh_in_test() ->
   ?assertEqual(Value, 1000000),
   ?assertEqual(Version, 1),
   ?assertEqual(Coinbase, false),
-  
-  ?assertEqual(Inputs,[#{previous_output => #{
+  ?assertEqual(Inputs,[#{address_hash => <<"f815b036d9bbbce5e9f2a00abd1bf3dc91e95510">>,
+                         addresses => [<<"3QJmV3qfvL9SuYo34YihAf3sRCW3qSinyC">>,
+                           <<"1PckZWMENRq4pP6bwT46k2gwGgDLJAfnMF">>],
+                         previous_output => #{
                            hash => <<"3c9018e8d5615c306d72397f8f5eef44308c98fb576a88e030c25456b4f3a7ac">>,
                            index => 0},
                          script => <<"0048304502200187af928e9d155c4b1ac9c1c9118153239aba76774f775d7c1f9c3e106ff33c0221008822b0f658edec22274d0b6ae9de10ebf2da06b1bbdaaba4e50eb078f39e3d78014730440220795f0f4f5941a77ae032ecb9e33753788d7eb5cb0c78d805575d6b00a1d9bfed02203e1f4ad9332d1416ae01e27038e945bc9db59c732728a383a6f1ed2fb99da7a4014cc952410491bba2510912a5bd37da1fb5b1673010e43d2c6d812c514e91bfa9f2eb129e1c183329db55bd868e209aac2fbc02cb33d98fe74bf23f0c235d6126b1d8334f864104865c40293a680cb9c020e7b1e106d8c1916d3cef99aa431a56d253e69256dac09ef122b1a986818a7cb624532f062c1d1f8722084861c5c3291ccffef4ec687441048d2455d2403e08708fc1f556002f1b6cd83f992d085097f9974ab08a28838f07896fbab08f39495e15fa6fad6edbfb1e754e35fa1c7844c41f322a1863d4621353ae">>,
                          script_asm => <<"zero [304502200187af928e9d155c4b1ac9c1c9118153239aba76774f775d7c1f9c3e106ff33c0221008822b0f658edec22274d0b6ae9de10ebf2da06b1bbdaaba4e50eb078f39e3d7801] [30440220795f0f4f5941a77ae032ecb9e33753788d7eb5cb0c78d805575d6b00a1d9bfed02203e1f4ad9332d1416ae01e27038e945bc9db59c732728a383a6f1ed2fb99da7a401] [52410491bba2510912a5bd37da1fb5b1673010e43d2c6d812c514e91bfa9f2eb129e1c183329db55bd868e209aac2fbc02cb33d98fe74bf23f0c235d6126b1d8334f864104865c40293a680cb9c020e7b1e106d8c1916d3cef99aa431a56d253e69256dac09ef122b1a986818a7cb624532f062c1d1f8722084861c5c3291ccffef4ec687441048d2455d2403e08708fc1f556002f1b6cd83f992d085097f9974ab08a28838f07896fbab08f39495e15fa6fad6edbfb1e754e35fa1c7844c41f322a1863d4621353ae]">>,
                          sequence => 4294967295}]),
-  ?assertEqual(Outputs, [#{address => <<"1GtpSrGhRGY5kkrNz4RykoqRQoJuG2L6DS">>,
+  ?assertEqual(Outputs, [#{address_hash => <<"ae56b4db13554d321c402db3961187aed1bbed5b">>,
+                           address => <<"1GtpSrGhRGY5kkrNz4RykoqRQoJuG2L6DS">>,
                            script => <<"76a914ae56b4db13554d321c402db3961187aed1bbed5b88ac">>,
                            script_asm => <<"dup hash160 [ae56b4db13554d321c402db3961187aed1bbed5b] equalverify checksig">>,
                            size => 34,
@@ -121,8 +126,9 @@ tx_decode_p2sh_out_testnet_test() ->
   ?assertEqual(Value, 1000000),
   ?assertEqual(Version, 1),
   ?assertEqual(Coinbase, false),
-  
-  ?assertEqual(Inputs,[#{address => <<"moLSP4ZqhzkQKccVw93RJfZT5DBxTR3bWA">>,
+  ?assertEqual(Inputs,[#{addresses => [<<"2N14i5HuL4L8sqTTs1oMWXKhKa668tkG5HZ">>,
+                           <<"moLSP4ZqhzkQKccVw93RJfZT5DBxTR3bWA">>],
+                         address_hash => <<"55c3e0412df763244b0fe23a5129cda6f606be45">>,
                          previous_output => #{
                            hash => <<"d6f72aab8ff86ff6289842a0424319bf2ddba85dc7c52757912297f948286389">>,
                            index => 0},
@@ -130,55 +136,37 @@ tx_decode_p2sh_out_testnet_test() ->
                          script_asm => <<"[3045022100abbc8a73fe2054480bda3f3281da2d0c51e2841391abd4c09f4f908a2034c18d02205bc9e4d68eafb918f3e9662338647a4419c0de1a650ab8983f1d216e2a31d8e301] [046f55d7adeff6011c7eac294fe540c57830be80e9355c83869c9260a4b8bf4767a66bacbd70b804dc63d5beeb14180292ad7f3b083372b1d02d7a37dd97ff5c9e]">>,
                          sequence => 4294967295}]),
   ?assertEqual(Outputs, [#{address => <<"2NFryYnmhXneo7LRajgLZnc38dYiDePvf3G">>,
+                           address_hash => <<"f815b036d9bbbce5e9f2a00abd1bf3dc91e95510">>,
                            script => <<"a914f815b036d9bbbce5e9f2a00abd1bf3dc91e9551087">>,
                            script_asm => <<"hash160 [f815b036d9bbbce5e9f2a00abd1bf3dc91e95510] equal">>,
                            size => 32,
                            value => 1000000}]).
 
-tx_decode_p2sh_in_testnet_test() ->
-  #{inputs := Inputs, outputs := Outputs,
-    coinbase := Coinbase, hash := Hash,
-    size := Size, value := Value,
-    version := Version} = libbitcoin:tx_decode(?raw_tx_p2sh_in, testnet),
-  ?assertEqual(Coinbase, false),
-  ?assertEqual(Hash, <<"837dea37ddc8b1e3ce646f1a656e79bbd8cc7f558ac56a169626d649ebe2a3ba">>),
-  ?assertEqual(Size, 436),
-  ?assertEqual(Value, 1000000),
-  ?assertEqual(Version, 1),
-  ?assertEqual(Coinbase, false),
-  
-  ?assertEqual(Inputs,[#{previous_output => #{
-                           hash => <<"3c9018e8d5615c306d72397f8f5eef44308c98fb576a88e030c25456b4f3a7ac">>,
-                           index => 0},
-                         script => <<"0048304502200187af928e9d155c4b1ac9c1c9118153239aba76774f775d7c1f9c3e106ff33c0221008822b0f658edec22274d0b6ae9de10ebf2da06b1bbdaaba4e50eb078f39e3d78014730440220795f0f4f5941a77ae032ecb9e33753788d7eb5cb0c78d805575d6b00a1d9bfed02203e1f4ad9332d1416ae01e27038e945bc9db59c732728a383a6f1ed2fb99da7a4014cc952410491bba2510912a5bd37da1fb5b1673010e43d2c6d812c514e91bfa9f2eb129e1c183329db55bd868e209aac2fbc02cb33d98fe74bf23f0c235d6126b1d8334f864104865c40293a680cb9c020e7b1e106d8c1916d3cef99aa431a56d253e69256dac09ef122b1a986818a7cb624532f062c1d1f8722084861c5c3291ccffef4ec687441048d2455d2403e08708fc1f556002f1b6cd83f992d085097f9974ab08a28838f07896fbab08f39495e15fa6fad6edbfb1e754e35fa1c7844c41f322a1863d4621353ae">>,
-                         script_asm => <<"zero [304502200187af928e9d155c4b1ac9c1c9118153239aba76774f775d7c1f9c3e106ff33c0221008822b0f658edec22274d0b6ae9de10ebf2da06b1bbdaaba4e50eb078f39e3d7801] [30440220795f0f4f5941a77ae032ecb9e33753788d7eb5cb0c78d805575d6b00a1d9bfed02203e1f4ad9332d1416ae01e27038e945bc9db59c732728a383a6f1ed2fb99da7a401] [52410491bba2510912a5bd37da1fb5b1673010e43d2c6d812c514e91bfa9f2eb129e1c183329db55bd868e209aac2fbc02cb33d98fe74bf23f0c235d6126b1d8334f864104865c40293a680cb9c020e7b1e106d8c1916d3cef99aa431a56d253e69256dac09ef122b1a986818a7cb624532f062c1d1f8722084861c5c3291ccffef4ec687441048d2455d2403e08708fc1f556002f1b6cd83f992d085097f9974ab08a28838f07896fbab08f39495e15fa6fad6edbfb1e754e35fa1c7844c41f322a1863d4621353ae]">>,
-                         sequence => 4294967295}]),
-  ?assertEqual(Outputs, [#{address => <<"mwQmjuMgEHyLXsKzhdQMaj3kGnuc8cwpGJ">>,
-                           script => <<"76a914ae56b4db13554d321c402db3961187aed1bbed5b88ac">>,
-                           script_asm => <<"dup hash160 [ae56b4db13554d321c402db3961187aed1bbed5b] equalverify checksig">>,
-                           size => 34,
-                           value => 1000000}]).
-
-
-tx_encode_test() ->
-  tx_encode_test(#{
-    inputs => [?TXIN],
-    outputs => [?TXOUT_KH, ?TXOUT_SH, ?TXOUT_STEALTH],
-    locktime => 0,
-    sequence => 16#FFFFFFFF,
-    tx_version => 1,
-    script_version => 5
-  }),
-  tx_encode_test(#{
-    inputs => [?TXIN],
-    outputs => [?TXOUT_KH, ?TXOUT_SH, ?TXOUT_STEALTH]
-  }),
+test_tx_decode_witness_test() ->
+  Raw = hexstr_to_bin("02000000000101f936e23842886389ae82099ffbd82c4ffb8dc20ee61558c455881e9ca529b36b0100000023220020d4d66b8009b7d11cbd33828a047194c638c70d9646f1d513a90cd1ce7fff7e6affffffff0380f0fa020000000017a91446e62f5a5c41f63ed844b825bacab103ba05e8ef87404456020000000017a914520c9f3f403f40a0f8bda6922f580b53eacf11d98720a10700000000001976a9147e2d5f79c0674343e6a8661be0966721cd2ca56b88ac0400473044022023319e5d465f11f4b52a30cdca37c2bce12fded2ea3e9dd5354dbd04b890e2190220333d54be01198a0ad8cb27b440bcffcd56b166869610be44c076aff3896d6c7a01473044022051a19be6ff729abaf35121c4421f66add5f12b6a7d34c0d28e734a10f4d907a002203f48ac07bf763c8ca3e75c4f7d30bdb5df205c626d69d47632b1d83b2863677001475221022f751e595ddf54e214612958c0891ebfa4b42fa564c8dea39bd84a9c875f4e2b21032a63fade8ec70aad146e81bf4a5843991921fc67fa83cc0a3d9b6b80e036e03e52ae00000000"),
+  #{inputs := [#{witness := Witness}]} = libbitcoin:tx_decode(Raw),
+  ?assertEqual(Witness, "[] [3044022023319e5d465f11f4b52a30cdca37c2bce12fded2ea3e9dd5354dbd04b890e2190220333d54be01198a0ad8cb27b440bcffcd56b166869610be44c076aff3896d6c7a01] [3044022051a19be6ff729abaf35121c4421f66add5f12b6a7d34c0d28e734a10f4d907a002203f48ac07bf763c8ca3e75c4f7d30bdb5df205c626d69d47632b1d83b2863677001] [5221022f751e595ddf54e214612958c0891ebfa4b42fa564c8dea39bd84a9c875f4e2b21032a63fade8ec70aad146e81bf4a5843991921fc67fa83cc0a3d9b6b80e036e03e52ae]"),
   ok.
 
-tx_encode_test(TxObj) ->
-  Tx = libbitcoin:tx_encode(TxObj),
-  ?assertEqual(?TX, Tx),
-  ok.
+%%tx_encode_test() ->
+%%  tx_encode_test(#{
+%%    inputs => [?TXIN],
+%%    outputs => [?TXOUT_KH, ?TXOUT_SH],
+%%    locktime => 0,
+%%    sequence => 16#FFFFFFFF,
+%%    tx_version => 1,
+%%    script_version => 5
+%%  }),
+%%  tx_encode_test(#{
+%%    inputs => [?TXIN],
+%%    outputs => [?TXOUT_KH, ?TXOUT_SH]
+%%  }),
+%%  ok.
+
+%%tx_encode_test(TxObj) ->
+%%  Tx = libbitcoin:tx_encode(TxObj),
+%%  ?assertEqual(?TX, Tx),
+%%  ok.
 
 header_decode_test() ->
   ?assertEqual(#{bits => 403253488,
@@ -208,6 +196,12 @@ script_to_address_test() ->
 input_signature_hash_test() ->
   Encoded = libbitcoin:input_signature_hash(?SIGHASH_TX, ?SIGHASH_INDEX, ?SIGHASH_SCRIPT, ?SIGHASH_TYPE),
   ?assertEqual(?SIGHASH, Encoded),
+  ok.
+
+input_signature_hash_v0_test() ->
+  Encoded = libbitcoin:input_signature_hash_v0(?SIGHASH_TX, ?SIGHASH_INDEX, ?SIGHASH_SCRIPT, ?SIGHASH_TYPE, 10000),
+  ?assertEqual(<<"48178ceecb05ba283caa20a1b7998c654784880e801a3329ad74ea8d53894d26">>, Encoded),
+
   ok.
 
 spend_checksum_test() ->
